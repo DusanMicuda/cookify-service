@@ -5,7 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import java.util.*
 
 /**
- * Implements the `TokenService` interface for generating JSON Web Tokens (JWTs) using the JWT library.
+ * Implements the [TokenService] interface for generating JSON Web Tokens (JWTs) using the JWT library.
  */
 class JwtTokenService: TokenService {
 
