@@ -1,5 +1,6 @@
 package com.micudasoftware.data.userprofile
 
+import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId
 
 /**
@@ -12,7 +13,7 @@ import org.bson.types.ObjectId
  * @property profilePhoto The name of the user's profile photo.
  */
 data class UserProfile(
-    val userId: ObjectId,
+    @BsonId val userId: ObjectId,
     val userName: String,
     val aboutMeText: String? = null,
     val titlePhoto: String? = null,
