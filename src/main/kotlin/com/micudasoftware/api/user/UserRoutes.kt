@@ -106,6 +106,7 @@ fun Route.login(
             }
             !isEmailValid(request.email) -> {
                 call.respond(HttpStatusCode.BadRequest, "Wrong format of email")
+                return@post
             }
         }
 

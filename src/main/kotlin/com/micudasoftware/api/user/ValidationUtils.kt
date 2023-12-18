@@ -16,5 +16,5 @@ fun isEmailValid(email: String) = Regex(EMAIL_REGEX).matches(email)
  */
 fun isPasswordValid(password: String) = Regex(PASSWORD_REGEX).matches(password)
 
-const val EMAIL_REGEX = "^\\S+@\\S+\\.\\S+\$\n"
+const val EMAIL_REGEX = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$"
 const val PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}\$"
