@@ -1,5 +1,6 @@
 package com.micudasoftware
 
+import com.micudasoftware.data.image.LocalImageDataSource
 import com.micudasoftware.data.user.MongoUserDataSource
 import com.micudasoftware.data.userprofile.MongoUserProfileDataSource
 import com.micudasoftware.plugins.configureMonitoring
@@ -34,6 +35,7 @@ fun Application.module() {
     )
     val hashingService = SHA256HashingService()
     val userProfileDataSource = MongoUserProfileDataSource(db)
+    val imageDataSource = LocalImageDataSource()
 
     configureMonitoring()
     configureSerialization()
@@ -43,6 +45,7 @@ fun Application.module() {
         hashingService,
         tokenService,
         tokenConfig,
-        userProfileDataSource
+        userProfileDataSource,
+        imageDataSource
     )
 }

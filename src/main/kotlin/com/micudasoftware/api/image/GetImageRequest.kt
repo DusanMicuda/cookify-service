@@ -1,4 +1,4 @@
-package com.micudasoftware.api.userprofile
+package com.micudasoftware.api.image
 
 import kotlinx.serialization.Serializable
 
