@@ -25,13 +25,17 @@ fun Route.userProfile(
     route("profile") {
         authenticate {
             get {
-                val userId = call.principal<JWTPrincipal>()?.getClaim("userId", String::class)
-                if (userId == null) {
-                    call.respond(HttpStatusCode.InternalServerError, "Can't get user id from token")
+                val request = call.receiveNullable<GetUserProfileRequest>() ?: run {
+                    call.respond(HttpStatusCode.BadRequest)
                     return@get
                 }
 
-                val userProfile = userProfileDataSource.getUserProfileById(ObjectId(userId))
+                if (request.userId.isBlank()) {
+                    call.respond(HttpStatusCode.BadRequest, "User id is blank")
+                    return@get
+                }
+
+                val userProfile = userProfileDataSource.getUserProfileById(ObjectId(request.userId))
                 if(userProfile == null) {
                     call.respond(HttpStatusCode.NotFound, "User profile with given id wasn't found")
                     return@get
