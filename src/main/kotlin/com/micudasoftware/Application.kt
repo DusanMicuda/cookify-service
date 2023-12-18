@@ -1,6 +1,7 @@
 package com.micudasoftware
 
 import com.micudasoftware.data.user.MongoUserDataSource
+import com.micudasoftware.data.userprofile.MongoUserProfileDataSource
 import com.micudasoftware.plugins.configureMonitoring
 import com.micudasoftware.plugins.configureRouting
 import com.micudasoftware.plugins.configureSecurity
@@ -32,9 +33,16 @@ fun Application.module() {
         secret = System.getenv("JWT_SECRET")
     )
     val hashingService = SHA256HashingService()
+    val userProfileDataSource = MongoUserProfileDataSource(db)
 
     configureMonitoring()
     configureSerialization()
     configureSecurity(tokenConfig)
-    configureRouting(userDataSource, hashingService, tokenService, tokenConfig)
+    configureRouting(
+        userDataSource,
+        hashingService,
+        tokenService,
+        tokenConfig,
+        userProfileDataSource
+    )
 }

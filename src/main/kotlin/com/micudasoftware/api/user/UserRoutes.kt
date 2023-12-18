@@ -2,6 +2,8 @@ package com.micudasoftware.api.user
 
 import com.micudasoftware.data.user.User
 import com.micudasoftware.data.user.UserDataSource
+import com.micudasoftware.data.userprofile.UserProfile
+import com.micudasoftware.data.userprofile.UserProfileDataSource
 import com.micudasoftware.security.hashing.HashingService
 import com.micudasoftware.security.hashing.SaltedHash
 import com.micudasoftware.security.token.TokenClaim
@@ -18,10 +20,12 @@ import io.ktor.server.routing.*
  * Defines an endpoint for user sign-up, handling user registration and data validation
  *
  * @param userDataSource The [UserDataSource] instance used to interact with the user data storage
+ * @param userProfileDataSource The [UserProfileDataSource] instance used to interact with the user profile data storage
  * @param hashingService The [HashingService] instance used for secure password hashing
  */
 fun Route.signUp(
     userDataSource: UserDataSource,
+    userProfileDataSource: UserProfileDataSource,
     hashingService: HashingService
 ) {
     post("signup") {
@@ -59,7 +63,11 @@ fun Route.signUp(
             password = saltedHash.hash,
             salt = saltedHash.salt
         )
-        val wasAcknowledged = userDataSource.insertUser(user)
+        val userProfile = UserProfile(
+            userId = user.id,
+            userName = user.name,
+        )
+        val wasAcknowledged = userDataSource.insertUser(user) && userProfileDataSource.createUserProfile(userProfile)
         if (!wasAcknowledged) {
             call.respond(HttpStatusCode.InternalServerError, "Data was not saved")
             return@post

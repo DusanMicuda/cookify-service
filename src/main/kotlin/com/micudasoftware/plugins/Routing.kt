@@ -3,7 +3,10 @@ package com.micudasoftware.plugins
 import com.micudasoftware.api.user.authenticate
 import com.micudasoftware.api.user.login
 import com.micudasoftware.api.user.signUp
+import com.micudasoftware.api.userprofile.image
+import com.micudasoftware.api.userprofile.userProfile
 import com.micudasoftware.data.user.UserDataSource
+import com.micudasoftware.data.userprofile.UserProfileDataSource
 import com.micudasoftware.security.hashing.HashingService
 import com.micudasoftware.security.token.TokenConfig
 import com.micudasoftware.security.token.TokenService
@@ -14,11 +17,15 @@ fun Application.configureRouting(
     userDataSource: UserDataSource,
     hashingService: HashingService,
     tokenService: TokenService,
-    tokenConfig: TokenConfig
+    tokenConfig: TokenConfig,
+    userProfileDataSource: UserProfileDataSource,
 ) {
     routing {
-        signUp(userDataSource, hashingService)
+        signUp(userDataSource,userProfileDataSource, hashingService)
         login(userDataSource, hashingService, tokenService, tokenConfig)
         authenticate()
+
+        userProfile(userProfileDataSource = userProfileDataSource)
+        image()
     }
 }
