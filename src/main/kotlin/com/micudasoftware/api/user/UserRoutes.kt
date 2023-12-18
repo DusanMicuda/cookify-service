@@ -125,6 +125,7 @@ fun Route.login(
         )
         if (!isPasswordValid) {
             call.respond(HttpStatusCode.Conflict, "Invalid password")
+            return@post
         }
 
         val token = tokenService.generate(
