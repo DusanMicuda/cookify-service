@@ -45,8 +45,8 @@ fun Route.image(
                             ).toString()
                         )
                         call.respondFile(it)
-                    }.onError { code, message ->
-                        call.respond(code, message)
+                    }.onError {
+                        call.respond(it.code, it.message)
                     }
             }
 
@@ -81,8 +81,8 @@ fun Route.image(
                         }
 
                         call.respond(HttpStatusCode.OK, UploadImageResponse(file.path))
-                    }.onError { code,_ ->
-                        call.respond(code, "Image wasn't uploaded")
+                    }.onError {
+                        call.respond(it.code, "Image wasn't uploaded")
                     }
             }
         }
