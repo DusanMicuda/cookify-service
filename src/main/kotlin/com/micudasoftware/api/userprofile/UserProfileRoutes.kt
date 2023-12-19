@@ -25,13 +25,10 @@ fun Route.userProfile(
     route("profile") {
         authenticate {
             get {
-                val request = call.receiveNullable<GetUserProfileRequest>() ?: run {
-                    call.respond(HttpStatusCode.BadRequest)
-                    return@get
-                }
+                val request = call.receive<GetUserProfileRequest>()
 
-                if (request.userId.isBlank()) {
-                    call.respond(HttpStatusCode.BadRequest, "User id is blank")
+                request.validate().onError {
+                    call.respond(it.code, it.message)
                     return@get
                 }
 
@@ -54,8 +51,10 @@ fun Route.userProfile(
             }
 
             post {
-                val request = call.receiveNullable<UpdateUserProfileRequest>() ?: run {
-                    call.respond(HttpStatusCode.BadRequest)
+                val request = call.receive<UpdateUserProfileRequest>()
+
+                request.validate().onError {
+                    call.respond(it.code, it.message)
                     return@post
                 }
 
@@ -84,8 +83,8 @@ fun Route.userProfile(
                         userId = ObjectId(userId),
                         userName = request.userName,
                         aboutMeText = request.aboutMeText,
-                        profilePhoto = newProfilePhotoUrl ?: request.profilePhotoUrl,
-                        titlePhoto = newTitlePhotoUrl ?: request.titlePhotoUrl
+                        profilePhoto = newProfilePhotoUrl,
+                        titlePhoto = newTitlePhotoUrl
                     )
                 )
                 if (!wasAcknowledged) {

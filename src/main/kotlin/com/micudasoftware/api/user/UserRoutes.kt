@@ -29,31 +29,16 @@ fun Route.signUp(
     hashingService: HashingService
 ) {
     post("signup") {
-        val request = call.receiveNullable<SignUpRequest>() ?: run {
-            call.respond(HttpStatusCode.BadRequest)
+        val request = call.receive<SignUpRequest>()
+
+        request.validate().onError {
+            call.respond(it.code, it.message)
             return@post
         }
 
-        val fieldsAreBlank = request.name.isBlank() || request.email.isBlank() || request.password.isBlank()
-        val emailAlreadyUsed = userDataSource.getUserByEmail(request.email) != null
-
-        when {
-            fieldsAreBlank -> {
-                call.respond(HttpStatusCode.BadRequest, "Required data are blank")
-                return@post
-            }
-            !isEmailValid(request.email) -> {
-                call.respond(HttpStatusCode.BadRequest, "Wrong format of email")
-                return@post
-            }
-            !isPasswordValid(request.password) -> {
-                call.respond(HttpStatusCode.BadRequest, "Weak password")
-                return@post
-            }
-            emailAlreadyUsed -> {
-                call.respond(HttpStatusCode.Conflict, "Email is already used")
-                return@post
-            }
+        if (userDataSource.getUserByEmail(request.email) != null) {
+            call.respond(HttpStatusCode.Conflict, "Email is already used")
+            return@post
         }
 
         val saltedHash = hashingService.generateSaltedHash(request.password)
@@ -92,22 +77,11 @@ fun Route.login(
     tokenConfig: TokenConfig,
 ) {
     post("login") {
-        val request = call.receiveNullable<LoginRequest>() ?: run {
-            call.respond(HttpStatusCode.BadRequest)
+        val request = call.receive<LoginRequest>()
+
+        request.validate().onError {
+            call.respond(it.code, it.message)
             return@post
-        }
-
-        val fieldsAreBlank = request.email.isBlank() || request.password.isBlank()
-
-        when {
-            fieldsAreBlank -> {
-                call.respond(HttpStatusCode.BadRequest, "Required data are blank")
-                return@post
-            }
-            !isEmailValid(request.email) -> {
-                call.respond(HttpStatusCode.BadRequest, "Wrong format of email")
-                return@post
-            }
         }
 
         val user = userDataSource.getUserByEmail(request.email)

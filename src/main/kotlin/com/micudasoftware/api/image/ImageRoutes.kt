@@ -21,18 +21,10 @@ fun Route.image(
     route("image") {
         authenticate {
             get {
-                val request = call.receiveNullable<GetImageRequest>() ?: kotlin.run {
-                    call.respond(HttpStatusCode.BadRequest)
-                    return@get
-                }
+                val request = call.receive<GetImageRequest>()
 
-                if (request.imageUrl.isBlank()) {
-                    call.respond(HttpStatusCode.BadRequest, "Image url is blank")
-                    return@get
-                }
-
-                if (!request.imageUrl.startsWith("data/")) {
-                    call.respond(HttpStatusCode.BadRequest, "Invalid Image Url")
+                request.validate().onError {
+                    call.respond(it.code, it.message)
                     return@get
                 }
 

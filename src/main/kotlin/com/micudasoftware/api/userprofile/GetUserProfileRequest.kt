@@ -1,5 +1,8 @@
 package com.micudasoftware.api.userprofile
 
+import com.micudasoftware.common.BaseRequest
+import com.micudasoftware.common.Result
+import io.ktor.http.*
 import kotlinx.serialization.Serializable
 
 /**
@@ -10,4 +13,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GetUserProfileRequest(
     val userId: String,
-)
+) : BaseRequest {
+
+    override fun validate(): Result<Unit> =
+        when {
+            userId.isBlank() -> Result.Error(HttpStatusCode.BadRequest, "User id is blank")
+            else -> Result.Success(Unit)
+        }
+}
