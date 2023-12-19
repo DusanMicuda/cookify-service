@@ -1,6 +1,7 @@
 package com.micudasoftware.data.image
 
 import com.micudasoftware.common.Result
+import io.ktor.utils.io.*
 import java.io.File
 
 /**
@@ -19,10 +20,15 @@ interface ImageDataSource {
     /**
      * Creates a new cached image file.
      *
+     * @param channel The [ByteReadChannel] that contains the uploaded image.
      * @param mimeType The MIME type of the image to be cached.
-     * @return A [File] object representing the newly created cached image.
+     * @return If succeeds, [Result] with [NewImageUrl] representing the URL of newly created cached image,
+     * otherwise an error.
      */
-    suspend fun getNewCachedImage(mimeType: String): File
+    suspend fun saveNewImageToCache(
+        channel: ByteReadChannel,
+        mimeType: String
+    ): Result<File>
 
     /**
      * Saves an image from cache to a new path.
