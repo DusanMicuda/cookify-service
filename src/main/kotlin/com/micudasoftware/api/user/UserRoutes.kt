@@ -15,6 +15,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.koin.ktor.ext.inject
 
 /**
  * Defines an endpoint for user sign-up, handling user registration and data validation
@@ -24,9 +25,9 @@ import io.ktor.server.routing.*
  * @param hashingService The [HashingService] instance used for secure password hashing
  */
 fun Route.signUp(
-    userDataSource: UserDataSource,
-    userProfileDataSource: UserProfileDataSource,
-    hashingService: HashingService
+    userDataSource: UserDataSource = inject<UserDataSource>().value,
+    userProfileDataSource: UserProfileDataSource = inject<UserProfileDataSource>().value,
+    hashingService: HashingService = inject<HashingService>().value
 ) {
     post("signup") {
         val request = call.receive<SignUpRequest>()
@@ -71,10 +72,10 @@ fun Route.signUp(
  * @param tokenConfig The [TokenConfig] object containing token configuration parameters
  */
 fun Route.login(
-    userDataSource: UserDataSource,
-    hashingService: HashingService,
-    tokenService: TokenService,
-    tokenConfig: TokenConfig,
+    userDataSource: UserDataSource = inject<UserDataSource>().value,
+    hashingService: HashingService = inject<HashingService>().value,
+    tokenService: TokenService = inject<TokenService>().value,
+    tokenConfig: TokenConfig = inject<TokenConfig>().value,
 ) {
     post("login") {
         val request = call.receive<LoginRequest>()

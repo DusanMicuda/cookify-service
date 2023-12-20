@@ -8,6 +8,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.koin.ktor.ext.inject
 
 /**
  * Defines an endpoint for getting and uploading images.
@@ -16,7 +17,7 @@ import io.ktor.server.routing.*
  * @param imageDataSource The data source of the images
  */
 fun Route.image(
-    imageDataSource: ImageDataSource
+    imageDataSource: ImageDataSource = inject<ImageDataSource>().value,
 ) {
     route("image") {
         authenticate {

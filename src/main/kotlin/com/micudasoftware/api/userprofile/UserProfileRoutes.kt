@@ -11,6 +11,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.bson.types.ObjectId
+import org.koin.ktor.ext.inject
 
 /**
  * Defines an endpoint for getting and updating user profile.
@@ -19,8 +20,8 @@ import org.bson.types.ObjectId
  * @param userProfileDataSource The [UserProfileDataSource] instance used to interact with the user profile data storage
  */
 fun Route.userProfile(
-    userProfileDataSource: UserProfileDataSource,
-    imageDataSource: ImageDataSource,
+    userProfileDataSource: UserProfileDataSource = inject<UserProfileDataSource>().value,
+    imageDataSource: ImageDataSource = inject<ImageDataSource>().value,
 ) {
     route("profile") {
         authenticate {

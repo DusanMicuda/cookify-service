@@ -1,6 +1,7 @@
 
 val ktor_version: String by project
 val kotlin_version: String by project
+val koin_version: String by project
 val commons_codec_version: String by project
 val kmongo_version: String by project
 val logback_version: String by project
@@ -33,6 +34,8 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jvm")
     implementation("io.ktor:ktor-server-auth-jwt-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
+
+    implementation("io.insert-koin:koin-ktor:$koin_version")
 
     implementation("commons-codec:commons-codec:$commons_codec_version")
 

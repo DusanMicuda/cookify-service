@@ -6,8 +6,11 @@ import com.micudasoftware.security.token.TokenConfig
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
+import org.koin.ktor.ext.inject
 
-fun Application.configureSecurity(tokenConfig: TokenConfig) {
+fun Application.configureSecurity(
+    tokenConfig: TokenConfig = inject<TokenConfig>().value
+) {
     authentication {
         jwt {
             realm = this@configureSecurity.environment.config.property("jwt.realm").getString()
