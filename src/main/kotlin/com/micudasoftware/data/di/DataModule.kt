@@ -15,9 +15,8 @@ import org.litote.kmongo.reactivestreams.KMongo
 
 val dataModule = module {
     single<CoroutineDatabase> {
-        val mongoPassword = System.getenv("MONGO_PASSWORD")
         KMongo.createClient(
-            connectionString = "mongodb+srv://micudasoftware:$mongoPassword@coockifydb.rbzh02f.mongodb.net/?retryWrites=true&w=majority"
+            connectionString = System.getenv("MONGO_CONNECTION")
         ).coroutine.getDatabase("cookifyDB")
     }
     singleOf(::MongoUserDataSource) { bind<UserDataSource>() }
