@@ -1,6 +1,8 @@
 package com.micudasoftware.plugins
 
 import com.micudasoftware.api.image.image
+import com.micudasoftware.api.recipe.latestRecipes
+import com.micudasoftware.api.recipe.recipe
 import com.micudasoftware.api.user.authenticate
 import com.micudasoftware.api.user.login
 import com.micudasoftware.api.user.signUp
@@ -16,5 +18,8 @@ fun Application.configureRouting() {
 
         userProfile()
         image()
+
+        recipe()
+        latestRecipes()
     }
 }

@@ -2,6 +2,8 @@ package com.micudasoftware.data.di
 
 import com.micudasoftware.data.image.ImageDataSource
 import com.micudasoftware.data.image.LocalImageDataSource
+import com.micudasoftware.data.recipe.MongoRecipeDatasource
+import com.micudasoftware.data.recipe.RecipeDataSource
 import com.micudasoftware.data.user.MongoUserDataSource
 import com.micudasoftware.data.user.UserDataSource
 import com.micudasoftware.data.userprofile.MongoUserProfileDataSource
@@ -22,4 +24,5 @@ val dataModule = module {
     singleOf(::MongoUserDataSource) { bind<UserDataSource>() }
     singleOf(::MongoUserProfileDataSource) { bind<UserProfileDataSource>() }
     singleOf(::LocalImageDataSource) { bind<ImageDataSource>() }
+    singleOf(::MongoRecipeDatasource) { bind<RecipeDataSource>() }
 }
