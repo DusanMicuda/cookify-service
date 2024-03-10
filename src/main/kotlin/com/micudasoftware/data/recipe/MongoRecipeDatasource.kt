@@ -19,6 +19,9 @@ class MongoRecipeDatasource(
     override suspend fun createRecipe(recipe: Recipe): Boolean =
         recipes.insertOne(recipe).wasAcknowledged()
 
+    override suspend fun updateRecipe(recipe: Recipe): Boolean =
+        recipes.updateOneById(recipe.id, recipe).wasAcknowledged()
+
     override suspend fun getRecipeById(recipeId: ObjectId): Recipe? =
         recipes.findOne(Recipe::id eq recipeId)
 

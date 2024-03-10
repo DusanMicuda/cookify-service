@@ -16,6 +16,14 @@ interface RecipeDataSource {
     suspend fun createRecipe(recipe: Recipe): Boolean
 
     /**
+     * Function to update recipe.
+     *
+     * @param recipe The recipe with existing id and data to update.
+     * @return Boolean that indicates if recipe was updated or not.
+     */
+    suspend fun updateRecipe(recipe: Recipe): Boolean
+
+    /**
      * Function to get recipe by its id.
      *
      * @param recipeId The id of recipe.

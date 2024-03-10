@@ -1,6 +1,7 @@
 package com.micudasoftware.api.recipe
 
 import com.micudasoftware.data.image.ImageDataSource
+import com.micudasoftware.data.recipe.Rating
 import com.micudasoftware.data.recipe.Recipe
 import com.micudasoftware.data.recipe.RecipeDataSource
 import com.micudasoftware.data.userprofile.UserProfileDataSource
@@ -44,7 +45,7 @@ fun Route.recipe(
 
                 val newRecipeId = ObjectId()
 
-                val photos = request.photos.mapNotNull() {
+                val photos = request.photos.mapNotNull {
                     imageDataSource.saveImageFromCache(
                         imageUrl = it,
                         newPath = "recipes/${newRecipeId}"
@@ -70,6 +71,11 @@ fun Route.recipe(
 
             get {
                 val request = call.receive<GetRecipeRequest>()
+                val userId = call.principal<JWTPrincipal>()?.getClaim("userId", String::class)
+                if (userId == null) {
+                    call.respond(HttpStatusCode.InternalServerError, "Can't get userId")
+                    return@get
+                }
 
                 request.validate().onError {
                     call.respond(it.code, it.message)
@@ -97,8 +103,9 @@ fun Route.recipe(
                     name = recipe.name,
                     ingredients = recipe.ingredients,
                     preparation = recipe.preparation,
-                    rating = recipe.rating,
-                    ratingCount = recipe.ratingCount,
+                    rating = recipe.ratings.sumOf { it.rating } / recipe.ratings.size,
+                    myRating = recipe.ratings.find { it.userId == userId }?.rating,
+                    ratingCount = recipe.ratings.size,
                     photos = recipe.photos
                 )
                 call.respond(HttpStatusCode.OK, recipeResponse)
@@ -123,6 +130,12 @@ fun Route.latestRecipes(
 ) {
     authenticate {
         get("latestRecipes") {
+            val userId = call.principal<JWTPrincipal>()?.getClaim("userId", String::class)
+            if (userId == null) {
+                call.respond(HttpStatusCode.InternalServerError, "Can't get userId")
+                return@get
+            }
+
             val count = call.request.queryParameters["count"]?.toIntOrNull() ?: 10
             val offset = call.request.queryParameters["offset"]?.toIntOrNull() ?: 0
             val recipes = recipeDataSource.getLatestRecipes(count, offset)
@@ -143,13 +156,55 @@ fun Route.latestRecipes(
                     name = recipe.name,
                     ingredients = recipe.ingredients,
                     preparation = recipe.preparation,
-                    rating = recipe.rating,
-                    ratingCount = recipe.ratingCount,
+                    rating = recipe.ratings.sumOf { it.rating } / recipe.ratings.size,
+                    myRating = recipe.ratings.find { it.userId == userId }?.rating,
+                    ratingCount = recipe.ratings.size,
                     photos = recipe.photos
                 )
             }
 
             call.respond(HttpStatusCode.OK, recipes)
+        }
+    }
+}
+
+fun Route.rateRecipe(
+    recipeDataSource: RecipeDataSource = inject<RecipeDataSource>().value,
+) {
+    authenticate {
+        put("rating") {
+            val request = call.receive<RateRecipeRequest>()
+
+            request.validate().onError {
+                call.respond(it.code, it.message)
+                return@put
+            }
+
+            val userId = call.principal<JWTPrincipal>()?.getClaim("userId", String::class)
+            if (userId == null) {
+                call.respond(HttpStatusCode.InternalServerError, "Can't get userId")
+                return@put
+            }
+
+            val recipe = recipeDataSource.getRecipeById(ObjectId(request.recipeId))
+            if (recipe == null) {
+                call.respond(HttpStatusCode.NotFound, "Recipe with given id doesn't exits.")
+                return@put
+            }
+
+            recipeDataSource.updateRecipe(
+                recipe.copy(
+                    ratings = recipe.ratings.toMutableList()
+                        .apply {
+                            add(
+                                Rating(
+                                    userId = userId,
+                                    rating = request.rating
+                                )
+                            )
+                        }
+                )
+            )
         }
     }
 }

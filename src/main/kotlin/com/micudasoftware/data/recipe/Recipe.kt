@@ -12,8 +12,7 @@ import org.bson.types.ObjectId
  * @property name The recipe name.
  * @property ingredients The ingredients represented as [List] of [Ingredient].
  * @property preparation The preparation guide.
- * @property rating The rating of the recipe.
- * @property ratingCount The number of ratings.
+ * @property ratings The ratings of the recipe.
  * @property photos The photos.
  */
 data class Recipe(
@@ -23,7 +22,6 @@ data class Recipe(
     val name: String,
     val ingredients: List<Ingredient>,
     val preparation: String,
-    val rating: Double = 0.0,
-    val ratingCount: Int = 0,
+    val ratings: List<Rating> = emptyList(),
     val photos: List<String>,
 )

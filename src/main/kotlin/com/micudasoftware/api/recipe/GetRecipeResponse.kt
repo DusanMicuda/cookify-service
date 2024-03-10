@@ -13,6 +13,7 @@ import kotlinx.serialization.Serializable
  * @property ingredients The ingredients represented as [List] of [Ingredient].
  * @property preparation The preparation guide.
  * @property rating The rating of the recipe.
+ * @property myRating The rating provided from user that requests the recipe.
  * @property ratingCount The number of ratings.
  * @property photos The photos.
  */
@@ -25,6 +26,7 @@ data class GetRecipeResponse(
     val ingredients: List<Ingredient>,
     val preparation: String,
     val rating: Double,
+    val myRating: Double?,
     val ratingCount: Int,
     val photos: List<String>,
 )
