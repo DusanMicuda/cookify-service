@@ -36,7 +36,8 @@ interface RecipeDataSource {
      *
      * @param count The number of recipes to get.
      * @param offset The number of recipes to skip.
+     * @param regex The regex to filter recipes by name.
      * @return The [List] of [Recipe].
      */
-    suspend fun getLatestRecipes(count: Int, offset: Int): List<Recipe>
+    suspend fun getLatestRecipes(count: Int, offset: Int, regex: String?): List<Recipe>
 }

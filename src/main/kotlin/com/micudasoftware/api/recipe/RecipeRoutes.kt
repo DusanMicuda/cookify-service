@@ -163,6 +163,7 @@ fun Route.recipe(
  * Contains query parameters:
  * - `count` Number of recipes to get.
  * - `offset` Number of recipes to skip.
+ * - `regex` String representing regular expression to filter by names.
  *
  * @param recipeDataSource Data source for recipes.
  * @param userProfileDataSource Data source for user profiles.
@@ -181,7 +182,8 @@ fun Route.latestRecipes(
 
             val count = call.request.queryParameters["count"]?.toIntOrNull() ?: 10
             val offset = call.request.queryParameters["offset"]?.toIntOrNull() ?: 0
-            val recipes = recipeDataSource.getLatestRecipes(count, offset)
+            val regex = call.request.queryParameters["regex"]
+            val recipes = recipeDataSource.getLatestRecipes(count, offset, regex)
 
             recipes.map { recipe ->
                 val author = userProfileDataSource.getUserProfileById(recipe.authorId)
