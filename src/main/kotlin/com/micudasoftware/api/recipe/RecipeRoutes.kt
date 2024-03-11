@@ -16,7 +16,7 @@ import org.bson.types.ObjectId
 import org.koin.ktor.ext.inject
 
 /**
- * Defines an endpoints to create and get [Recipe].
+ * Defines an endpoints to create, update and get [Recipe].
  *
  * @param recipeDataSource Data source for recipes.
  * @param imageDataSource Data source for images.
@@ -110,6 +110,49 @@ fun Route.recipe(
                 )
                 call.respond(HttpStatusCode.OK, recipeResponse)
             }
+
+            put {
+                val request = call.receive<UpdateRecipeRequest>()
+                val userId = call.principal<JWTPrincipal>()?.getClaim("userId", String::class)
+                if (userId == null) {
+                    call.respond(HttpStatusCode.InternalServerError, "Can't get userId")
+                    return@put
+                }
+
+                request.validate().onError {
+                    call.respond(it.code, it.message)
+                    return@put
+                }
+
+                val recipe = recipeDataSource.getRecipeById(ObjectId(request.id))
+                if (recipe == null) {
+                    call.respond(HttpStatusCode.NotFound, "Recipe with given id wasn't found")
+                    return@put
+                }
+
+                if (recipe.authorId.toString() != userId) {
+                    call.respond(HttpStatusCode.Conflict, "Cannot update recipe that is not yours")
+                    return@put
+                }
+
+                val wasAcknowledged = recipeDataSource.updateRecipe(
+                    Recipe(
+                        id = recipe.id,
+                        timestamp = recipe.timestamp,
+                        authorId = recipe.authorId,
+                        name = request.name,
+                        ingredients = request.ingredients,
+                        preparation = request.preparation,
+                        photos = request.photos,
+                    )
+                )
+
+                if (wasAcknowledged) {
+                    call.respond(HttpStatusCode.OK)
+                } else {
+                    call.respond(HttpStatusCode.InternalServerError, "Recipe wasn't updated")
+                }
+            }
         }
     }
 }
@@ -192,7 +235,7 @@ fun Route.rateRecipe(
                 return@put
             }
 
-            recipeDataSource.updateRecipe(
+            val wasAcknowledged = recipeDataSource.updateRecipe(
                 recipe.copy(
                     ratings = recipe.ratings.toMutableList()
                         .apply {
@@ -205,6 +248,12 @@ fun Route.rateRecipe(
                         }
                 )
             )
+
+            if (wasAcknowledged) {
+                call.respond(HttpStatusCode.OK)
+            } else {
+                call.respond(HttpStatusCode.InternalServerError, "Recipe wasn't rated")
+            }
         }
     }
 }
