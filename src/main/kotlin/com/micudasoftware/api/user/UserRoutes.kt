@@ -111,7 +111,7 @@ fun Route.login(
             )
         )
 
-        call.respond(HttpStatusCode.OK, LoginResponse(token))
+        call.respond(HttpStatusCode.OK, LoginResponse(user.id.toString(), token))
     }
 }
 
