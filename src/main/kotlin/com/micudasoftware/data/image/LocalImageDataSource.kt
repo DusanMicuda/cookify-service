@@ -28,7 +28,7 @@ class LocalImageDataSource : ImageDataSource {
 
     override suspend fun saveNewImageToCache(
         channel: ByteReadChannel,
-        mimeType: String
+        fileName: String
     ): Result<File> = withContext(Dispatchers.IO) {
         try {
             val dir = File("data/cache/images")
@@ -36,8 +36,8 @@ class LocalImageDataSource : ImageDataSource {
                 dir.mkdirs()
             }
 
-            val extension = convertMimeToExtension(mimeType)
-            val newFile = File("data/cache/images/${UUID.randomUUID()}$extension")
+            val extension = fileName.substringAfterLast('.', "")
+            val newFile = File("data/cache/images/${UUID.randomUUID()}.$extension")
             newFile.createNewFile()
 
             channel.copyAndClose(newFile.writeChannel())
@@ -67,20 +67,4 @@ class LocalImageDataSource : ImageDataSource {
                 Result.Success(imageUrl)
             }
         }
-
-    /**
-     * Converts a MIME type to a file extension.
-     *
-     * @param mimeType The MIME type to convert.
-     * @return A [String] representing the file extension.
-     */
-    private fun convertMimeToExtension(mimeType: String): String {
-        return when (mimeType) {
-            "image/jpeg" -> ".jpg"
-            "image/png" -> ".png"
-            "image/gif" -> ".gif"
-            "image/webp" -> ".webp"
-            else -> ""
-        }
-    }
 }

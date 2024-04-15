@@ -27,7 +27,7 @@ interface ImageDataSource {
      */
     suspend fun saveNewImageToCache(
         channel: ByteReadChannel,
-        mimeType: String
+        fileName: String
     ): Result<File>
 
     /**
