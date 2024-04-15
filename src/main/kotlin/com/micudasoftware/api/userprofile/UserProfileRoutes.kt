@@ -25,15 +25,14 @@ fun Route.userProfile(
 ) {
     route("profile") {
         authenticate {
-            get {
-                val request = call.receive<GetUserProfileRequest>()
-
-                request.validate().onError {
-                    call.respond(it.code, it.message)
+            get("{userId}") {
+                val userId = call.parameters["userId"]
+                if (userId.isNullOrBlank()) {
+                    call.respond(HttpStatusCode.BadRequest, "User id is blank")
                     return@get
                 }
 
-                val userProfile = userProfileDataSource.getUserProfileById(ObjectId(request.userId))
+                val userProfile = userProfileDataSource.getUserProfileById(ObjectId(userId))
                 if(userProfile == null) {
                     call.respond(HttpStatusCode.NotFound, "User profile with given id wasn't found")
                     return@get
