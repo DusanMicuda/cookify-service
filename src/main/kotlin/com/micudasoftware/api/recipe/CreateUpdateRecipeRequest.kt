@@ -7,7 +7,7 @@ import io.ktor.http.*
 import kotlinx.serialization.Serializable
 
 /**
- * Data class representing the request to create new recipe.
+ * Data class representing the request to create or update new recipe.
  *
  * @property name The name of the recipe.
  * @property ingredients The ingredients represented as [List] of [Ingredient].
@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
  * @property photos The photos represented as [List] of URLs.
  */
 @Serializable
-data class CreateRecipeRequest(
+data class CreateUpdateRecipeRequest(
     val name: String,
     val ingredients: List<Ingredient>,
     val preparation: String,

@@ -30,7 +30,7 @@ fun Route.recipe(
     route("recipe") {
         authenticate {
             post {
-                val request = call.receive<CreateRecipeRequest>()
+                val request = call.receive<CreateUpdateRecipeRequest>()
 
                 request.validate().onError {
                     call.respond(it.code, it.message)
@@ -69,20 +69,20 @@ fun Route.recipe(
                 }
             }
 
-            get {
-                val request = call.receive<GetRecipeRequest>()
+            get("{recipeId}") {
                 val userId = call.principal<JWTPrincipal>()?.getClaim("userId", String::class)
                 if (userId == null) {
                     call.respond(HttpStatusCode.InternalServerError, "Can't get userId")
                     return@get
                 }
 
-                request.validate().onError {
-                    call.respond(it.code, it.message)
+                val recipeId = call.parameters["recipeId"]
+                if (recipeId.isNullOrBlank()) {
+                    call.respond(HttpStatusCode.BadRequest, "Recipe id is blank")
                     return@get
                 }
 
-                val recipe = recipeDataSource.getRecipeById(ObjectId(request.recipeId))
+                val recipe = recipeDataSource.getRecipeById(ObjectId(recipeId))
                 if (recipe == null) {
                     call.respond(HttpStatusCode.NotFound, "Recipe with given id wasn't found")
                     return@get
@@ -111,11 +111,17 @@ fun Route.recipe(
                 call.respond(HttpStatusCode.OK, recipeResponse)
             }
 
-            put {
-                val request = call.receive<UpdateRecipeRequest>()
+            put("{recipeId}") {
+                val request = call.receive<CreateUpdateRecipeRequest>()
                 val userId = call.principal<JWTPrincipal>()?.getClaim("userId", String::class)
                 if (userId == null) {
                     call.respond(HttpStatusCode.InternalServerError, "Can't get userId")
+                    return@put
+                }
+
+                val recipeId = call.parameters["recipeId"]
+                if (recipeId.isNullOrBlank()) {
+                    call.respond(HttpStatusCode.BadRequest, "Recipe id is blank")
                     return@put
                 }
 
@@ -124,7 +130,7 @@ fun Route.recipe(
                     return@put
                 }
 
-                val recipe = recipeDataSource.getRecipeById(ObjectId(request.id))
+                val recipe = recipeDataSource.getRecipeById(ObjectId(recipeId))
                 if (recipe == null) {
                     call.respond(HttpStatusCode.NotFound, "Recipe with given id wasn't found")
                     return@put
