@@ -189,10 +189,11 @@ fun Route.latestRecipes(
             val count = call.request.queryParameters["count"]?.toIntOrNull() ?: 10
             val offset = call.request.queryParameters["offset"]?.toIntOrNull() ?: 0
             val regex = call.request.queryParameters["regex"]
-            val recipes = recipeDataSource.getLatestRecipes(count, offset, regex)
-
-            recipes.map { recipe ->
+            val recipes = recipeDataSource.getLatestRecipes(count, offset, regex).map { recipe ->
                 val author = userProfileDataSource.getUserProfileById(recipe.authorId)
+                val rating = if (recipe.ratings.isNotEmpty()) {
+                    recipe.ratings.sumOf { it.rating } / recipe.ratings.size
+                } else 0.0
 
                 GetRecipeResponse(
                     id = recipe.id.toString(),
@@ -207,7 +208,7 @@ fun Route.latestRecipes(
                     name = recipe.name,
                     ingredients = recipe.ingredients,
                     preparation = recipe.preparation,
-                    rating = recipe.ratings.sumOf { it.rating } / recipe.ratings.size,
+                    rating = rating,
                     myRating = recipe.ratings.find { it.userId == userId }?.rating,
                     ratingCount = recipe.ratings.size,
                     photos = recipe.photos

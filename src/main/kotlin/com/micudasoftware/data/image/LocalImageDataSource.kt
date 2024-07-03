@@ -15,7 +15,7 @@ import java.util.*
 class LocalImageDataSource : ImageDataSource {
 
     override suspend fun getImage(url: String): Result<File> {
-        val image = File(url)
+        val image = File("data/$url")
         return if (image.exists() && image.isFile && image.canRead()) {
             Result.Success(image)
         } else {
@@ -56,7 +56,7 @@ class LocalImageDataSource : ImageDataSource {
                     val newFile = File("data/$newPath/$fileName")
                     file.copyTo(newFile, true)
                     file.delete()
-                    Result.Success(newFile.path as NewImageUrl)
+                    Result.Success(newFile.path.removePrefix("data/"))
                 } else {
                     Result.Error(
                         HttpStatusCode.InternalServerError,

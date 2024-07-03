@@ -25,15 +25,10 @@ fun Route.image(
 ) {
     route("image") {
         authenticate {
-            get {
-                val request = call.receive<GetImageRequest>()
+            get("{path}/{ownerId}/{imageId}") {
+                val imageUrl = call.parameters["path"] + "/" + call.parameters["ownerId"] + "/" + call.parameters["imageId"]
 
-                request.validate().onError {
-                    call.respond(it.code, it.message)
-                    return@get
-                }
-
-                imageDataSource.getImage(request.imageUrl)
+                imageDataSource.getImage(imageUrl)
                     .onSuccess {
                         call.response.header(
                             HttpHeaders.ContentDisposition,
@@ -88,7 +83,7 @@ fun Route.image(
                                 return@post
                             }
 
-                            call.respond(HttpStatusCode.OK, UploadImageResponse(file.path))
+                            call.respond(HttpStatusCode.OK, UploadImageResponse(file.path.removePrefix("data/")))
                         }.onError {
                             call.respond(it.code, "Image wasn't uploaded")
                         }

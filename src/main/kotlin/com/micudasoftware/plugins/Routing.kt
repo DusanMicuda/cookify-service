@@ -19,6 +19,7 @@ fun Application.configureRouting() {
 
         userProfile()
         image()
+//        staticFiles("/image", File("data"))
 
         recipe()
         latestRecipes()

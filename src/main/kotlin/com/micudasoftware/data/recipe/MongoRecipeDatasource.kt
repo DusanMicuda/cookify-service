@@ -3,7 +3,6 @@ package com.micudasoftware.data.recipe
 import org.bson.types.ObjectId
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
-import org.litote.kmongo.regex
 
 /**
  * The implementation of [RecipeDataSource] using Mongo database.
@@ -28,7 +27,7 @@ class MongoRecipeDatasource(
 
     override suspend fun getLatestRecipes(count: Int, offset: Int, regex: String?): List<Recipe> =
         recipes
-            .find(regex?.let { Recipe::name regex regex })
+            .find(/*regex?.let { Recipe::name regex regex }*/)
             .descendingSort(Recipe::timestamp)
             .skip(offset)
             .limit(count)
